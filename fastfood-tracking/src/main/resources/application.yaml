@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: fiap-fastfood-customer
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+  data:
+    mongodb:
+      repositories: true
+      port: ${MONGODB_PORT:27018}
+      auto-index-creation: true
+      uuid-representation: standard
+      host: ${MONGODB_HOST:localhost}
+      authentication-database: admin
+      database: ${MONGODB_DATABASE:fastfood}
+      username: ${MONGODB_USERNAME:root}
+      password: ${MONGODB_PASSWORD:rootpassword}
+
+aws:
+  sqs:
+    numberOfMessages: 5
+    waitTimeMessage: 10
+    numberOfRetries: 10
+    visibilityTimeOut: 30
+    url: ${PAYMENT_SQS_URL:http://localhost:8081}
+
+payment:
+  sqs:
+    queue: ${PAYMENT_QUEUE_NAME:fastfood-payment-queue}
+    dlq:
+      queue: ${PAYMENT_DLQ_QUEUE_NAME:fastfood-payment-dlq-queue}
+  webhook: ${WEBHOOK_URL:http://localhost:8080/v1/payment/receive}
+  client:
+    connectionTimeout: 50000
+    responseTimeout: 50000
+    readTimeout: 50000
+    writeTimeout: 50000
+    maxConnections: 5
+    url: ${PAYMENT_URL:http://localhost:8081}
+
+management:
+  endpoint:
+    loggers:
+      enabled: true
+    health:
+      probes:
+        enabled: true
+      show-details: "ALWAYS"
+  endpoints:
+    web:
+      exposure:
+        include: "*"
