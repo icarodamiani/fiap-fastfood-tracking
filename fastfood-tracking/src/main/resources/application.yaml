@@ -23,7 +23,6 @@ aws:
     waitTimeMessage: 10
     numberOfRetries: 10
     visibilityTimeOut: 30
-    url: ${PAYMENT_SQS_URL:http://localhost:8081}
 
 payment:
   sqs:

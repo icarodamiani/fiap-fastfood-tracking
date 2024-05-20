@@ -6,4 +6,8 @@ aws:
     uri: ${SQS_URI:http://localhost:9324}
 
 server:
-  port: 8082
+  port: 8083
+
+grpc:
+  server:
+    port: 9093
