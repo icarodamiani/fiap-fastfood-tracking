@@ -10,5 +10,5 @@ public interface OrderTrackingPort {
 
     Mono<OrderTracking> findByOrderId(String orderId);
 
-    Flux<OrderTracking> find(Pageable pageable);
+    Flux<OrderTracking> find(Pageable pageable, String role);
 }

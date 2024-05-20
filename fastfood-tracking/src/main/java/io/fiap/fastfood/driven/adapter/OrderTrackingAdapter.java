@@ -40,13 +40,15 @@ public class OrderTrackingAdapter implements OrderTrackingPort {
     }
 
     @Override
-    public Flux<OrderTracking> find(Pageable pageable) {
+    public Flux<OrderTracking> find(Pageable pageable, String role) {
         return orderTrackingRepository.findTracking(
                 pageable.getPageNumber(),
                 pageable.getPageNumber() * pageable.getPageSize(),
                 pageable.getPageSize()
             )
             .flatMapIterable(PaginatedOrderTrackingEntity::data)
+            .filter(tracking -> tracking.role().equals(role)
+                || tracking.role().equals("ALL") || tracking.role().equals("UNRECOGNIZED"))
             .map(orderTrackingMapper::domainFromEntity)
             .filter(orderTracking -> !"FINISHED".equals(orderTracking.orderStatus()))
             .switchIfEmpty(Mono.defer(() -> Mono.error(NotFoundException::new)));

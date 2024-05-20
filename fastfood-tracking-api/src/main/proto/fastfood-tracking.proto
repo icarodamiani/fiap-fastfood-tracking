@@ -26,11 +26,11 @@ message SaveOrderTrackingRequest {
      string orderId = 2;
      string orderNumber = 3;
      OrderTrackingStatus orderStatus = 4;
-     OrderTrackingRole role = 5;
      google.protobuf.Timestamp orderDateTime = 6;
 }
 
 message FindAllOrderTrackingRequest {
+    optional OrderTrackingRole role = 3;
 }
 
 message FindOrderTrackingByOrderIdRequest {

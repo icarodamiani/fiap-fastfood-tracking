@@ -18,11 +18,12 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 
 @GrpcService
 public class OrderTrackingGrpcServer extends OrderTrackingServiceGrpc.OrderTrackingServiceImplBase {
 
+    public static final int FIXED_PAGE_SIZE = 10000;
     private final OrderTrackingService service;
 
     private final GrpcStatusConverter statusConverter;
@@ -40,7 +41,7 @@ public class OrderTrackingGrpcServer extends OrderTrackingServiceGrpc.OrderTrack
                 .withOrderStatus(request.getOrderStatus().name())
                 .withOrderStatusValue(String.valueOf(request.getOrderStatus().getNumber()))
                 .withOrderId(request.getOrderId())
-                .withRole(request.getRole().name())
+                .withRole(assignRole(request.getOrderStatus()).name())
                 .withOrderDateTime(toLocalDate(request.getOrderDateTime()))
                 .build())
             .doOnError(throwable -> responseObserver.onError(statusConverter.toGrpcException(throwable)))
@@ -65,7 +66,7 @@ public class OrderTrackingGrpcServer extends OrderTrackingServiceGrpc.OrderTrack
 
     @Override
     public void findAllOrderTracking(FindAllOrderTrackingRequest request, StreamObserver<OrderTrackingResponse> responseObserver) {
-        service.find(Pageable.unpaged())
+        service.find(PageRequest.of(0, FIXED_PAGE_SIZE), request.getRole().name())
             .doOnError(throwable -> responseObserver.onError(statusConverter.toGrpcException(throwable)))
             .map(tracking -> OrderTrackingResponse.newBuilder()
                 .setId(tracking.id())
@@ -124,5 +125,12 @@ public class OrderTrackingGrpcServer extends OrderTrackingServiceGrpc.OrderTrack
                 .build();
         }
         return null;
+    }
+
+    public OrderTrackingRole assignRole(OrderTrackingStatus status) {
+        return switch (status) {
+            case PAYMENT_CONFIRMED, PREPARING, READY -> OrderTrackingRole.ALL;
+            default -> OrderTrackingRole.EMPLOYEE;
+        };
     }
 }

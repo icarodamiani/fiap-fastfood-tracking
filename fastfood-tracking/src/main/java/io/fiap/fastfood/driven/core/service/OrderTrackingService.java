@@ -28,8 +28,8 @@ public class OrderTrackingService implements OrderTrackingUseCase {
     }
 
     @Override
-    public Flux<OrderTracking> find(Pageable pageable) {
-        return orderTrackingPort.find(pageable);
+    public Flux<OrderTracking> find(Pageable pageable, String role) {
+        return orderTrackingPort.find(pageable, role);
     }
 
 }

@@ -5,29 +5,23 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document("pedido_acompanhamento")
+@Document("tracking")
 public record OrderTrackingEntity(
     @Id
     String id,
-    @Field("id_pedido")
+    @Field
     String orderId,
-
-    @Field("numero_pedido")
+    @Field
     String orderNumber,
-
-    @Field("status")
+    @Field
     String orderStatus,
-
-    @Field("status_value")
+    @Field
     String orderStatusValue,
-
-    @Field("visibilidade")
+    @Field
     String role,
-
-    @Field("data_hora")
+    @Field
     LocalDateTime orderDateTime,
-
-    @Field("tempo_decorrido")
+    @Field
     Long orderTimeSpent
 ) {
 

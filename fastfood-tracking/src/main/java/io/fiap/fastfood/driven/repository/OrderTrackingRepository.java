@@ -20,21 +20,21 @@ public interface OrderTrackingRepository extends ReactiveCrudRepository<OrderTra
         "            '$last':'$$ROOT'" +
         "         }," +
         "         '_id':{" +
-        "            '_id':'$id_pedido'" +
+        "            '_id':'$orderId'" +
         "         }" +
         "      }" +
         "   }",
         "   {" +
             "      '$addFields':{" +
-            "         'status':'$end.status'," +
-            "         'status_value':'$end.status_value',"+
-            "         'id_pedido':'$end.id_pedido'," +
-            "         'numero_pedido':'$end.numero_pedido'," +
-            "         'data_hora':'$end.data_hora'," +
-            "         'tempo_decorrido':{" +
+            "         'orderStatus':'$end.orderStatus'," +
+            "         'orderStatusValue':'$end.orderStatusValue',"+
+            "         'orderId':'$end.orderId'," +
+            "         'orderNumber':'$end.orderNumber'," +
+            "         'orderDateTime':'$end.orderDateTime'," +
+            "         'orderTimeSpent':{" +
             "            '$dateDiff':{" +
-            "               'startDate':'$start.data_hora'," +
-            "               'endDate':'$end.data_hora'," +
+            "               'startDate':'$start.orderDateTime'," +
+            "               'endDate':'$end.orderDateTime'," +
             "               'unit':'minute'" +
             "            }" +
             "         }" +
@@ -42,17 +42,17 @@ public interface OrderTrackingRepository extends ReactiveCrudRepository<OrderTra
             "   }",
         "   {" +
             "      '$project':{" +
-            "         'status':'$status'," +
-            "         'id_pedido':'$id_pedido'," +
-            "         'numero_pedido':'$numero_pedido'," +
-            "         'data_hora':'$data_hora'," +
-            "         'tempo_decorrido':'$tempo_decorrido'" +
+            "         'orderNumber':'$orderStatus'," +
+            "         'orderId':'$orderId'," +
+            "         'orderNumber':'$orderNumber'," +
+            "         'orderDateTime':'$orderDateTime'," +
+            "         'orderTimeSpent':'$orderTimeSpent'" +
             "      }" +
             "   }",
         "   {" +
             "      '$sort':{" +
-            "         'status_value': -1, " +
-            "         'data_hora': 1" +
+            "         'orderStatusValue': -1, " +
+            "         'orderDateTime': 1" +
             "      }" +
             "   }",
         "   {" +
