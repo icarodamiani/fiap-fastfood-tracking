@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: fiap-fastfood-tracking
+
+  data:
+    mongodb:
+      repositories: true
+      port: ${MONGODB_PORT:27017}
+      auto-index-creation: true
+      uuid-representation: standard
+      host: ${MONGODB_HOST:localhost}
+      authentication-database: admin
+      database: ${MONGODB_DATABASE:fastfood}
+      username: ${MONGODB_USERNAME:root}
+      password: ${MONGODB_PASSWORD:rootpassword}
+
+aws:
+  sqs:
+    numberOfMessages: 5
+    waitTimeMessage: 10
+    numberOfRetries: 10
+    visibilityTimeOut: 30
+
+payment:
+  sqs:
+    queue: ${PAYMENT_QUEUE_NAME:payment_queue}
+    dlq:
+      queue: ${PAYMENT_DLQ_QUEUE_NAME:payment_dlq_queue}
+
+management:
+  endpoint:
+    loggers:
+      enabled: true
+    health:
+      probes:
+        enabled: true
+      show-details: "ALWAYS"
+  endpoints:
+    web:
+      exposure:
+        include: "*"

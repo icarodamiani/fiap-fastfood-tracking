@@ -1,0 +1,48 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.fiap.fastfood</groupId>
+    <artifactId>fastfood-tracking-parent</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <modules>
+        <module>fastfood-tracking-api</module>
+        <module>fastfood-tracking</module>
+    </modules>
+
+    <properties>
+        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.cloud.version>2023.0.0</spring.cloud.version>
+        <spring.boot.version>3.2.3</spring.boot.version>
+    </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>gh-release</id>
+            <name>releases</name>
+            <url>https://maven.pkg.github.com/icarodamiani/fiap-fastfood-order</url>
+        </repository>
+        <snapshotRepository>
+            <id>gh-snapshot</id>
+            <name>snapshots</name>
+            <url>https://maven.pkg.github.com/icarodamiani/fiap-fastfood-order</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
