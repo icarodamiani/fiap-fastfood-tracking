@@ -1,14 +1,11 @@
 spring:
   application:
-    name: fiap-fastfood-customer
-
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:local}
+    name: fiap-fastfood-tracking
 
   data:
     mongodb:
       repositories: true
-      port: ${MONGODB_PORT:27018}
+      port: ${MONGODB_PORT:27017}
       auto-index-creation: true
       uuid-representation: standard
       host: ${MONGODB_HOST:localhost}
@@ -26,17 +23,9 @@ aws:
 
 payment:
   sqs:
-    queue: ${PAYMENT_QUEUE_NAME:fastfood-payment-queue}
+    queue: ${PAYMENT_QUEUE_NAME:payment_queue}
     dlq:
-      queue: ${PAYMENT_DLQ_QUEUE_NAME:fastfood-payment-dlq-queue}
-  webhook: ${WEBHOOK_URL:http://localhost:8080/v1/payment/receive}
-  client:
-    connectionTimeout: 50000
-    responseTimeout: 50000
-    readTimeout: 50000
-    writeTimeout: 50000
-    maxConnections: 5
-    url: ${PAYMENT_URL:http://localhost:8081}
+      queue: ${PAYMENT_DLQ_QUEUE_NAME:payment_dlq_queue}
 
 management:
   endpoint:

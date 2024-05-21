@@ -5,6 +5,12 @@ aws:
   sqs:
     uri: ${SQS_URI:http://localhost:9324}
 
+spring:
+  data:
+    mongodb:
+      repositories: true
+      port: 27018
+
 server:
   port: 8083
 

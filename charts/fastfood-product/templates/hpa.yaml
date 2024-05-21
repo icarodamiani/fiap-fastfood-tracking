@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "fastfood-api.fullname" . }}
+  name: {{ include "fastfood-tracking.fullname" . }}
   labels:
-    {{- include "fastfood-api.labels" . | nindent 4 }}
+    {{- include "fastfood-tracking.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "fastfood-api.fullname" . }}
+    name: {{ include "fastfood-tracking.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
