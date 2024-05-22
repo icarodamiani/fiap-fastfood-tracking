@@ -55,7 +55,6 @@ public class SqsClientConfig {
         return SqsAsyncClient
             .builder()
             .region(DefaultAwsRegionProviderChain.builder().build().getRegion())
-            .credentialsProvider(WebIdentityTokenFileCredentialsProvider.create())
             .build();
     }
 
