@@ -1,1 +1,41 @@
-# fiap-fastfood-tracking
+# Acompanhamento de Pedidos
+
+## Recursos e Bibliotecas
+- [x] Java 17
+- [x] Document DB
+- [x] Sp.ring Boot
+- [x] MapStruct
+- [x] Vavr
+- [x] JsonPatch
+
+
+## Dicionário de Linguagem Ubíqua
+
+Termos utilizados na implementação (Presentes em Código)
+
+- **Cliente/Customer**: O consumidor que realiza um pedido no restaurante.
+- **Pedido/Order**: A lista de produtos (seja uma bebida, lanche, acompanhamento e/ou sobremesa) realizada pelo cliente no restaurante.
+- **Produto/Product**: Item que será consumido pelo cliente, que se enquadra dentro de uma categoria, como por exemplo: bebida, lanche, acompanhamento e/ou sobremesa.
+- **Categoria/Product Type**: Como os produtos são dispostos e gerenciados pelo estabelecimento: bebidas, lanches, acompanhamentos e/ou sobremesas.
+- **Esteira de Pedidos/Order Tracking**: Responsável pelo andamento e monitoramento do estado do pedido.
+- **Funcionário/Employee**: Funcionário do estabelecimento.
+
+## Operações
+
+### [Acompanhamento de Pedidos]([BillingController.java](fastfood-api%2Fsrc%2Fmain%2Fjava%2Fio%2Ffiap%2Ffastfood%2Fdriver%2Fcontroller%2Fbilling%2FBillingController.java))
+Apartado da criação e do pagamento de pedidos, esta aplicação armazena o rastreio dos mesmos. Permitindo assim que a busca mais recorrente seja feita fora da base transacional.
+
+A api recebe os inputs de rastreio por dois diferentes meios, mensageria e chamadas HTTP2 (gRPC). Sendo que, atualmente a mensageria se encontra exclusiva exclusiva para a atualização do estado de pagamento de um pedido. 
+Porém podendo ser evoluída para algo que abranja todos os demais estados. 
+
+As operações de rastreio são expostas via gRPC e estão descritas no arquivo [fastfood-tracking.proto](fastfood-tracking-api%2Fsrc%2Fmain%2Fproto%2Ffastfood-tracking.proto).
+
+## Início rápido
+
+```shell 
+docker-compose up
+```
+Os serviçõs gRPC são expostos em [localhost:9090](http://localhost:9090).
+
+## Deploy
+O deploy das aplicações é feito e gerenciado através de Helm charts, estes localizados na pasta [charts](charts).
