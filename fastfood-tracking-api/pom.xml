@@ -33,6 +33,13 @@
         <project.scm.id>gh-release</project.scm.id>
     </properties>
 
+    <scm>
+        <connection>scm:git:https://github.com/icarodamiani/fiap-fastfood-tracking.git</connection>
+        <url>https://github.com/icarodamiani/fiap-fastfood-tracking.git</url>
+        <developerConnection>scm:git:https://github.com/icarodamiani/fiap-fastfood-tracking.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
     <distributionManagement>
         <repository>
             <id>gh-release</id>
@@ -45,12 +52,6 @@
             <url>https://maven.pkg.github.com/icarodamiani/fiap-fastfood-tracking</url>
         </snapshotRepository>
     </distributionManagement>
-
-    <scm>
-        <connection>scm:git:https://github.com/icarodamiani/fiap-fastfood-tracking.git</connection>
-        <url>https://github.com/icarodamiani/fiap-fastfood-tracking.git</url>
-        <developerConnection>scm:git:https://github.com/icarodamiani/fiap-fastfood-tracking.git</developerConnection>
-    </scm>
 
     <dependencyManagement>
         <dependencies>
@@ -137,6 +138,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <additionalOptions>-Xdoclint:none</additionalOptions>
+                </configuration>
             </plugin>
 
             <plugin>
