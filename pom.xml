@@ -23,12 +23,12 @@
         <repository>
             <id>gh-release</id>
             <name>releases</name>
-            <url>https://maven.pkg.github.com/icarodamiani/fiap-fastfood-order</url>
+            <url>https://maven.pkg.github.com/icarodamiani/fiap-fastfood-tracking</url>
         </repository>
         <snapshotRepository>
             <id>gh-snapshot</id>
             <name>snapshots</name>
-            <url>https://maven.pkg.github.com/icarodamiani/fiap-fastfood-order</url>
+            <url>https://maven.pkg.github.com/icarodamiani/fiap-fastfood-tracking</url>
         </snapshotRepository>
     </distributionManagement>
 

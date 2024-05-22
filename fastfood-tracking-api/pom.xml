@@ -37,19 +37,19 @@
         <repository>
             <id>gh-release</id>
             <name>releases</name>
-            <url>https://maven.pkg.github.com/icarodamiani/fiap-fastfood-customer</url>
+            <url>https://maven.pkg.github.com/icarodamiani/fiap-fastfood-tracking</url>
         </repository>
         <snapshotRepository>
             <id>gh-snapshot</id>
             <name>snapshots</name>
-            <url>https://maven.pkg.github.com/icarodamiani/fiap-fastfood-customer</url>
+            <url>https://maven.pkg.github.com/icarodamiani/fiap-fastfood-tracking</url>
         </snapshotRepository>
     </distributionManagement>
 
     <scm>
-        <connection>scm:git:https://github.com/icarodamiani/fiap-fastfood-customer.git</connection>
-        <url>https://github.com/icarodamiani/fiap-fastfood-customer.git</url>
-        <developerConnection>scm:git:https://github.com/icarodamiani/fiap-fastfood-customer.git</developerConnection>
+        <connection>scm:git:https://github.com/icarodamiani/fiap-fastfood-tracking.git</connection>
+        <url>https://github.com/icarodamiani/fiap-fastfood-tracking.git</url>
+        <developerConnection>scm:git:https://github.com/icarodamiani/fiap-fastfood-tracking.git</developerConnection>
     </scm>
 
     <dependencyManagement>
