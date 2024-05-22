@@ -46,7 +46,7 @@ Seguem abaixo os passos:
 
 1 -
 ```
-./mvnw -s .m2/settings.xml clean install -Dmaven.test.skip=true -U -P dev
+./mvnw clean install -Dmaven.test.skip=true -U -P dev
 ```
 2 -
 ```
@@ -58,11 +58,12 @@ aws eks update-kubeconfig --name {CLUSTER_NAME} --region={AWS_REGION}
 ```
 4 -
 ```
-helm upgrade --install fastfood-order charts/fastfood-product \
+helm upgrade --install fastfood-order charts/fastfood-tracking \
 --kubeconfig $HOME/.kube/config \
---set containers.image=icarodamiani/fastfood-product \
+--set containers.image=icarodamiani/fastfood-tracking \
 --set image.tag=latest \
 --set database.mongodb.username.value=fastfood \
 --set database.mongodb.host.value={AWS_DOCUMENTDB_HOST} \
 --set database.mongodb.password.value={AWS_DOCUMENTDB_PASSWORD}
 ```
+
