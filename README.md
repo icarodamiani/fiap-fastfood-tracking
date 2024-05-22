@@ -66,4 +66,3 @@ helm upgrade --install fastfood-order charts/fastfood-tracking \
 --set database.mongodb.host.value={AWS_DOCUMENTDB_HOST} \
 --set database.mongodb.password.value={AWS_DOCUMENTDB_PASSWORD}
 ```
-
