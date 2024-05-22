@@ -38,4 +38,31 @@ docker-compose up
 Os serviçõs gRPC são expostos em [localhost:9090](http://localhost:9090).
 
 ## Deploy
-O deploy das aplicações é feito e gerenciado através de Helm charts, estes localizados na pasta [charts](charts).
+
+O deploy pode ser realizado através da execução do pipeline "Deploy product" no Github Actions.
+No entanto, anteriormente a execução, faz-se necessária a configuração do ID e SECRET da AWS nos secrets do repositório.
+Como o acesso às variáveis e secrets do respositório é limitado ao owner e maintainers, recomendo a execução dos passos do script de deploy localmente com apontamento para a cloud.
+Seguem abaixo os passos:
+
+1 -
+```
+./mvnw -s .m2/settings.xml clean install -Dmaven.test.skip=true -U -P dev
+```
+2 -
+```
+docker login registry-1.docker.io
+```
+3 -
+```
+aws eks update-kubeconfig --name {CLUSTER_NAME} --region={AWS_REGION}
+```
+4 -
+```
+helm upgrade --install fastfood-order charts/fastfood-product \
+--kubeconfig $HOME/.kube/config \
+--set containers.image=icarodamiani/fastfood-product \
+--set image.tag=latest \
+--set database.mongodb.username.value=fastfood \
+--set database.mongodb.host.value={AWS_DOCUMENTDB_HOST} \
+--set database.mongodb.password.value={AWS_DOCUMENTDB_PASSWORD}
+```
