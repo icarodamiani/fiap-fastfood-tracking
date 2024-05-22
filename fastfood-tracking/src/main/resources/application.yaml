@@ -28,6 +28,9 @@ payment:
       queue: ${PAYMENT_DLQ_QUEUE_NAME:payment_dlq_queue}
 
 management:
+  health:
+    probes:
+      enabled: true
   endpoint:
     loggers:
       enabled: true
