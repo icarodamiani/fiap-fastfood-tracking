@@ -52,10 +52,7 @@ public class SqsClientConfig {
                 .build();
         }
         LOGGER.info("SqsClientConfig -> amazonSQSClient -> Creating client to connect to cloud instance of AWS SQS.");
-        return SqsAsyncClient
-            .builder()
-            .region(DefaultAwsRegionProviderChain.builder().build().getRegion())
-            .build();
+        return SqsAsyncClient.builder().region(Region.US_EAST_1).build();
     }
 
     @Bean
