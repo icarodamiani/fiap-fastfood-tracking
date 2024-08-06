@@ -5,12 +5,12 @@ import software.amazon.awssdk.services.sqs.model.DeleteMessageResponse;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 
-public interface PaymentStatusPort {
-    Mono<ReceiveMessageResponse> receivePaymentStatus();
+public interface TrackingUpdatePort {
+    Mono<ReceiveMessageResponse> receiveTracking();
 
-    Mono<ReceiveMessageResponse> receivePaymentStatusDlq();
+    Mono<ReceiveMessageResponse> receiveTrackingDlq();
 
-    Mono<DeleteMessageResponse> acknowledgePaymentStatus(Message message);
+    Mono<DeleteMessageResponse> ackTracking(Message message);
 
-    Mono<DeleteMessageResponse> acknowledgePaymentStatusDlq(Message message);
+    Mono<DeleteMessageResponse> ackTrackingDlq(Message message);
 }

@@ -1,6 +1,6 @@
 package io.fiap.fastfood.driver.messaging;
 
-import io.fiap.fastfood.driven.core.service.PaymentStatusService;
+import io.fiap.fastfood.driven.core.messaging.TrackingHandler;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Objects;
@@ -19,23 +19,23 @@ import reactor.core.scheduler.Schedulers;
 
 
 @Component
-public class PaymentStatusDlqEventListener implements CommandLineRunner {
+public class TrackingEventListener implements CommandLineRunner {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentStatusDlqEventListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrackingEventListener.class);
 
     private final SimpleTriggerContext triggerContext;
     private final PeriodicTrigger trigger;
     private final Scheduler boundedElastic;
-    private final PaymentStatusService service;
+    private final TrackingHandler service;
 
-    public PaymentStatusDlqEventListener(@Value("${application.consumer.delay:10000}")
-                                      String delay,
-                                      @Value("${application.consumer.poolSize:1}")
-                                      String poolSize,
-                                      PaymentStatusService service) {
+    public TrackingEventListener(@Value("${application.consumer.delay:10000}")
+                                     String delay,
+                                 @Value("${application.consumer.poolSize:1}")
+                                     String poolSize,
+                                 TrackingHandler service) {
         this.service = service;
         boundedElastic = Schedulers.newBoundedElastic(Integer.parseInt(poolSize), 10000,
-            "paymentStatusDlqListenerPool", 600, true);
+            "trackingUpdateListenerPool", 600, true);
 
         this.triggerContext = new SimpleTriggerContext();
         this.trigger = new PeriodicTrigger(Long.parseLong(delay), TimeUnit.MILLISECONDS);
@@ -60,7 +60,7 @@ public class PaymentStatusDlqEventListener implements CommandLineRunner {
                             Objects.requireNonNull(triggerContext.lastScheduledExecutionTime()),
                             new Date(),
                             null))
-                    .flatMapMany(__ -> service.receiveAndHandlePaymentStatus())
+                    .flatMapMany(__ -> service.handle())
                     .doOnComplete(() -> triggerContext.update(
                         Objects.requireNonNull(triggerContext.lastScheduledExecutionTime()),
                         Objects.requireNonNull(triggerContext.lastActualExecutionTime()),
