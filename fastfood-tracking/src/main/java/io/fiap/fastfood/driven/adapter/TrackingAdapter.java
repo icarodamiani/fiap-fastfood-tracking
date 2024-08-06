@@ -1,6 +1,6 @@
 package io.fiap.fastfood.driven.adapter;
 
-import io.fiap.fastfood.driven.core.domain.message.port.outbound.PaymentStatusPort;
+import io.fiap.fastfood.driven.core.domain.message.port.outbound.TrackingUpdatePort;
 import io.vavr.Function1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,45 +18,45 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 
 @Service
-public class PaymentStatusAdapter implements PaymentStatusPort {
+public class TrackingAdapter implements TrackingUpdatePort {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentStatusAdapter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrackingAdapter.class);
 
     private final SqsAsyncClient sqsClient;
-    private final String paymentStatusQueue;
-    private final String paymentStatusDlqQueue;
+    private final String trackingUpdateQueue;
+    private final String trackingUpdateDlqQueue;
     private final String numberOfMessages;
     private final String waitTimeMessage;
     private final String visibilityTimeOut;
 
-    public PaymentStatusAdapter(SqsAsyncClient sqsClient,
-                                @Value("${payment.sqs.queue}") String paymentStatusQueue,
-                                @Value("${payment.sqs.dlq.queue}") String paymentStatusDlqQueue,
-                                @Value("${aws.sqs.numberOfMessages}") String numberOfMessages,
-                                @Value("${aws.sqs.waitTimeMessage}") String waitTimeMessage,
-                                @Value("${aws.sqs.visibilityTimeOut}") String visibilityTimeOut) {
+    public TrackingAdapter(SqsAsyncClient sqsClient,
+                           @Value("${payment.sqs.queue}") String trackingUpdateQueue,
+                           @Value("${payment.sqs.dlq.queue}") String trackingUpdateDlqQueue,
+                           @Value("${aws.sqs.numberOfMessages}") String numberOfMessages,
+                           @Value("${aws.sqs.waitTimeMessage}") String waitTimeMessage,
+                           @Value("${aws.sqs.visibilityTimeOut}") String visibilityTimeOut) {
         this.sqsClient = sqsClient;
-        this.paymentStatusQueue = paymentStatusQueue;
-        this.paymentStatusDlqQueue = paymentStatusDlqQueue;
+        this.trackingUpdateQueue = trackingUpdateQueue;
+        this.trackingUpdateDlqQueue = trackingUpdateDlqQueue;
         this.numberOfMessages = numberOfMessages;
         this.waitTimeMessage = waitTimeMessage;
         this.visibilityTimeOut = visibilityTimeOut;
     }
 
-    public Mono<ReceiveMessageResponse> receivePaymentStatus() {
-        return receive(paymentStatusQueue);
+    public Mono<ReceiveMessageResponse> receiveTracking() {
+        return receive(trackingUpdateQueue);
     }
 
-    public Mono<ReceiveMessageResponse> receivePaymentStatusDlq() {
-        return receive(paymentStatusDlqQueue);
+    public Mono<ReceiveMessageResponse> receiveTrackingDlq() {
+        return receive(trackingUpdateDlqQueue);
     }
 
-    public Mono<DeleteMessageResponse> acknowledgePaymentStatus(Message message) {
-        return acknowledge(paymentStatusQueue, message);
+    public Mono<DeleteMessageResponse> ackTracking(Message message) {
+        return acknowledge(trackingUpdateQueue, message);
     }
 
-    public Mono<DeleteMessageResponse> acknowledgePaymentStatusDlq(Message message) {
-        return acknowledge(paymentStatusDlqQueue, message);
+    public Mono<DeleteMessageResponse> ackTrackingDlq(Message message) {
+        return acknowledge(trackingUpdateDlqQueue, message);
     }
 
     private Mono<ReceiveMessageResponse> receive(String queue) {

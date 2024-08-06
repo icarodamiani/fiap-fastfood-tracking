@@ -23,9 +23,10 @@ aws:
 
 payment:
   sqs:
-    queue: ${PAYMENT_QUEUE_NAME:payment_queue}
-    dlq:
-      queue: ${PAYMENT_DLQ_QUEUE_NAME:payment_dlq_queue}
+    create:
+      queue: ${TRACKING_QUEUE_NAME:tracking_queue}
+      dlq:
+        queue: ${TRACKING_DLQ_QUEUE_NAME:tracking_dlq_queue}
 
 management:
   health:

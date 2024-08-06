@@ -1,6 +1,6 @@
 package io.fiap.fastfood.driver.messaging;
 
-import io.fiap.fastfood.driven.core.service.PaymentStatusService;
+import io.fiap.fastfood.driven.core.messaging.TrackingHandler;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Objects;
@@ -19,23 +19,23 @@ import reactor.core.scheduler.Schedulers;
 
 
 @Component
-public class PaymentStatusEventListener implements CommandLineRunner {
+public class TrackingDlqEventListener implements CommandLineRunner {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PaymentStatusEventListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrackingDlqEventListener.class);
 
     private final SimpleTriggerContext triggerContext;
     private final PeriodicTrigger trigger;
     private final Scheduler boundedElastic;
-    private final PaymentStatusService service;
+    private final TrackingHandler service;
 
-    public PaymentStatusEventListener(@Value("${application.consumer.delay:10000}")
-                                     String delay,
-                                      @Value("${application.consumer.poolSize:1}")
-                                     String poolSize,
-                                      PaymentStatusService service) {
+    public TrackingDlqEventListener(@Value("${application.consumer.delay:10000}")
+                                      String delay,
+                                    @Value("${application.consumer.poolSize:1}")
+                                      String poolSize,
+                                    TrackingHandler service) {
         this.service = service;
         boundedElastic = Schedulers.newBoundedElastic(Integer.parseInt(poolSize), 10000,
-            "paymentStatusListenerPool", 600, true);
+            "trackingUpdateDlqListenerPool", 600, true);
 
         this.triggerContext = new SimpleTriggerContext();
         this.trigger = new PeriodicTrigger(Long.parseLong(delay), TimeUnit.MILLISECONDS);
@@ -60,7 +60,7 @@ public class PaymentStatusEventListener implements CommandLineRunner {
                             Objects.requireNonNull(triggerContext.lastScheduledExecutionTime()),
                             new Date(),
                             null))
-                    .flatMapMany(__ -> service.receiveAndHandlePaymentStatus())
+                    .flatMapMany(__ -> service.handleUpdateDlq())
                     .doOnComplete(() -> triggerContext.update(
                         Objects.requireNonNull(triggerContext.lastScheduledExecutionTime()),
                         Objects.requireNonNull(triggerContext.lastActualExecutionTime()),
