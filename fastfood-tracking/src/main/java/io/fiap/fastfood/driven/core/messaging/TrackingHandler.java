@@ -1,14 +1,17 @@
 package io.fiap.fastfood.driven.core.messaging;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fiap.fastfood.driven.core.domain.message.port.inbound.PaymentStatusUseCase;
-import io.fiap.fastfood.driven.core.domain.message.port.outbound.TrackingUpdatePort;
+import io.fiap.fastfood.driven.core.domain.model.Notification;
 import io.fiap.fastfood.driven.core.domain.model.OrderTracking;
+import io.fiap.fastfood.driven.core.domain.notification.port.outbound.NotificationPort;
+import io.fiap.fastfood.driven.core.domain.tracking.port.inbound.TrackingMessageUseCase;
 import io.fiap.fastfood.driven.core.domain.tracking.port.outbound.OrderTrackingPort;
+import io.fiap.fastfood.driven.core.domain.tracking.port.outbound.TrackingMessagePort;
 import io.fiap.fastfood.driven.core.exception.BadRequestException;
 import io.fiap.fastfood.driven.core.exception.BusinessException;
 import io.fiap.fastfood.driven.core.exception.NotFoundException;
 import io.vavr.CheckedFunction1;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,30 +22,35 @@ import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 
 @Service
-public class TrackingHandler implements PaymentStatusUseCase {
+public class TrackingHandler implements TrackingMessageUseCase {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackingHandler.class);
+    private static final List<String> ERROR_STATUSES = List.of("6");
 
-    private final TrackingUpdatePort paymentStatusPort;
+    private final TrackingMessagePort messageHandlerPort;
     private final OrderTrackingPort orderTrackingPort;
+    private final NotificationPort notificationPort;
     private final ObjectMapper mapper;
 
-    public TrackingHandler(TrackingUpdatePort paymentStatusPort,
+    public TrackingHandler(TrackingMessagePort messageHandlerPort,
                            OrderTrackingPort orderTrackingPort,
+                           NotificationPort notificationPort,
                            ObjectMapper mapper) {
-        this.paymentStatusPort = paymentStatusPort;
+        this.messageHandlerPort = messageHandlerPort;
         this.orderTrackingPort = orderTrackingPort;
+        this.notificationPort = notificationPort;
         this.mapper = mapper;
     }
 
     @Override
     public Flux<DeleteMessageResponse> handle() {
-        return paymentStatusPort.receiveTracking()
+        return messageHandlerPort.receiveTracking()
             .map(ReceiveMessageResponse::messages)
             .flatMapMany(messages ->
                 Flux.fromIterable(messages)
                     .flatMap(m -> Mono.just(readEvent().unchecked().apply(m))
                         .flatMap(this::tracking)
                         .flatMap(orderTrackingPort::createOrderTracking)
+                        .doOnSuccess(this::notify)
                         .map(__ -> m)
                         .onErrorResume(t ->
                                 t instanceof NotFoundException
@@ -53,9 +61,15 @@ public class TrackingHandler implements PaymentStatusUseCase {
                                 return Mono.just(m);
                             }
                         )
-                        .flatMap(paymentStatusPort::ackTracking)
+                        .flatMap(messageHandlerPort::ackTracking)
                     )
             );
+    }
+
+    private Mono<Notification> notify(OrderTracking tracking) {
+        return Mono.just(tracking)
+            .filter(t -> ERROR_STATUSES.contains(t.orderStatusValue()))
+            .flatMap(t -> notificationPort.createNotification(new Notification()));
     }
 
     private Mono<OrderTracking> tracking(OrderTracking tracking) {
@@ -69,13 +83,13 @@ public class TrackingHandler implements PaymentStatusUseCase {
     }
 
     @Override
-    public Flux<DeleteMessageResponse> handleUpdateDlq() {
-        return paymentStatusPort.receiveTrackingDlq()
+    public Flux<DeleteMessageResponse> handleDlq() {
+        return messageHandlerPort.receiveTrackingDlq()
             .map(ReceiveMessageResponse::messages)
             .flatMapMany(messages ->
                 Flux.fromIterable(messages)
                     .doOnEach(messageSignal -> LOGGER.info("Message retrieved from the dead-letter queue {}", messageSignal.get()))
-                    .flatMap(paymentStatusPort::ackTrackingDlq)
+                    .flatMap(messageHandlerPort::ackTrackingDlq)
             );
     }
 

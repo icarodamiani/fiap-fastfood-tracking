@@ -9,11 +9,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class OrderTrackingService implements OrderTrackingUseCase {
+public class TrackingService implements OrderTrackingUseCase {
 
     private final OrderTrackingPort orderTrackingPort;
 
-    public OrderTrackingService(OrderTrackingPort orderTrackingPort) {
+    public TrackingService(OrderTrackingPort orderTrackingPort) {
         this.orderTrackingPort = orderTrackingPort;
     }
 

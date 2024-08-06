@@ -60,7 +60,7 @@ public class TrackingDlqEventListener implements CommandLineRunner {
                             Objects.requireNonNull(triggerContext.lastScheduledExecutionTime()),
                             new Date(),
                             null))
-                    .flatMapMany(__ -> service.handleUpdateDlq())
+                    .flatMapMany(__ -> service.handleDlq())
                     .doOnComplete(() -> triggerContext.update(
                         Objects.requireNonNull(triggerContext.lastScheduledExecutionTime()),
                         Objects.requireNonNull(triggerContext.lastActualExecutionTime()),
