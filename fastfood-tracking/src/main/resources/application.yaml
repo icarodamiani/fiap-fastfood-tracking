@@ -23,8 +23,6 @@ aws:
     visibilityTimeOut: 30
     tracking:
       queue: ${TRACKING_QUEUE_NAME:tracking_queue}
-      dlq:
-        queue: ${TRACKING_DLQ_QUEUE_NAME:tracking_dlq_queue}
     notification:
       queue: ${NOTIFICATION_QUEUE_NAME:notification_queue}
 

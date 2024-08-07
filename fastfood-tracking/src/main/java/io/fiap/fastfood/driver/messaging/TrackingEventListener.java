@@ -1,6 +1,6 @@
 package io.fiap.fastfood.driver.messaging;
 
-import io.fiap.fastfood.driven.core.messaging.TrackingHandler;
+import io.fiap.fastfood.driven.core.domain.tracking.port.inbound.OrderTrackingUseCase;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Objects;
@@ -26,13 +26,13 @@ public class TrackingEventListener implements CommandLineRunner {
     private final SimpleTriggerContext triggerContext;
     private final PeriodicTrigger trigger;
     private final Scheduler boundedElastic;
-    private final TrackingHandler service;
+    private final OrderTrackingUseCase service;
 
     public TrackingEventListener(@Value("${application.consumer.delay:10000}")
                                      String delay,
                                  @Value("${application.consumer.poolSize:1}")
                                      String poolSize,
-                                 TrackingHandler service) {
+                                 OrderTrackingUseCase service) {
         this.service = service;
         boundedElastic = Schedulers.newBoundedElastic(Integer.parseInt(poolSize), 10000,
             "trackingUpdateListenerPool", 600, true);
@@ -60,7 +60,7 @@ public class TrackingEventListener implements CommandLineRunner {
                             Objects.requireNonNull(triggerContext.lastScheduledExecutionTime()),
                             new Date(),
                             null))
-                    .flatMapMany(__ -> service.handle())
+                    .flatMapMany(__ -> service.handleEvent())
                     .doOnComplete(() -> triggerContext.update(
                         Objects.requireNonNull(triggerContext.lastScheduledExecutionTime()),
                         Objects.requireNonNull(triggerContext.lastActualExecutionTime()),
