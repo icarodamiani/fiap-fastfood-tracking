@@ -10,7 +10,7 @@ import io.fiap.fastfood.OrderTrackingServiceGrpc;
 import io.fiap.fastfood.OrderTrackingStatus;
 import io.fiap.fastfood.SaveOrderTrackingRequest;
 import io.fiap.fastfood.driven.core.domain.model.OrderTracking;
-import io.fiap.fastfood.driven.core.service.OrderTrackingService;
+import io.fiap.fastfood.driven.core.service.TrackingService;
 import io.grpc.stub.StreamObserver;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -24,12 +24,12 @@ import org.springframework.data.domain.PageRequest;
 public class OrderTrackingGrpcServer extends OrderTrackingServiceGrpc.OrderTrackingServiceImplBase {
 
     public static final int FIXED_PAGE_SIZE = 10000;
-    private final OrderTrackingService service;
+    private final TrackingService service;
 
     private final GrpcStatusConverter statusConverter;
 
     @Autowired
-    public OrderTrackingGrpcServer(OrderTrackingService service, GrpcStatusConverter statusConverter) {
+    public OrderTrackingGrpcServer(TrackingService service, GrpcStatusConverter statusConverter) {
         this.service = service;
         this.statusConverter = statusConverter;
     }
