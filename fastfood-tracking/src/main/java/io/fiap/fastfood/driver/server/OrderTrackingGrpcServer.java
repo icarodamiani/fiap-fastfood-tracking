@@ -3,7 +3,7 @@ package io.fiap.fastfood.driver.server;
 
 import com.google.protobuf.Timestamp;
 import io.fiap.fastfood.FindAllOrderTrackingRequest;
-import io.fiap.fastfood.FindOrderTrackingByOrderIdRequest;
+import io.fiap.fastfood.FindOrderTrackingByOrderNumberRequest;
 import io.fiap.fastfood.OrderTrackingResponse;
 import io.fiap.fastfood.OrderTrackingRole;
 import io.fiap.fastfood.OrderTrackingServiceGrpc;
@@ -12,10 +12,12 @@ import io.fiap.fastfood.SaveOrderTrackingRequest;
 import io.fiap.fastfood.driven.core.domain.model.OrderTracking;
 import io.fiap.fastfood.driven.core.service.TrackingService;
 import io.grpc.stub.StreamObserver;
+import io.vavr.Function1;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -40,15 +42,14 @@ public class OrderTrackingGrpcServer extends OrderTrackingServiceGrpc.OrderTrack
                 .withOrderNumber(request.getOrderNumber())
                 .withOrderStatus(request.getOrderStatus().name())
                 .withOrderStatusValue(String.valueOf(request.getOrderStatus().getNumber()))
-                .withOrderId(request.getOrderId())
                 .withRole(assignRole(request.getOrderStatus()).name())
                 .withOrderDateTime(toLocalDate(request.getOrderDateTime()))
+                .withOrderTimeSpent(timeSpent().apply(request.getOrderDateTime()))
                 .build())
             .doOnError(throwable -> responseObserver.onError(statusConverter.toGrpcException(throwable)))
             .map(tracking ->
                 OrderTrackingResponse.newBuilder()
                     .setId(tracking.id())
-                    .setOrderId(tracking.orderId())
                     .setOrderNumber(tracking.orderNumber())
                     .setRole(OrderTrackingRole.valueOf(tracking.role()))
                     .setOrderStatus(OrderTrackingStatus.valueOf(tracking.orderStatus()))
@@ -64,13 +65,21 @@ public class OrderTrackingGrpcServer extends OrderTrackingServiceGrpc.OrderTrack
             .subscribe();
     }
 
+    private Function1<Timestamp, Long> timeSpent() {
+        return time -> {
+            var date = toLocalDate(time);
+            var now = LocalDateTime.now();
+
+            return ChronoUnit.MINUTES.between(date, now);
+        };
+    }
+
     @Override
     public void findAllOrderTracking(FindAllOrderTrackingRequest request, StreamObserver<OrderTrackingResponse> responseObserver) {
         service.find(PageRequest.of(0, FIXED_PAGE_SIZE), request.getRole().name())
             .doOnError(throwable -> responseObserver.onError(statusConverter.toGrpcException(throwable)))
             .map(tracking -> OrderTrackingResponse.newBuilder()
                 .setId(tracking.id())
-                .setOrderId(tracking.orderId())
                 .setOrderNumber(tracking.orderNumber())
                 .setRole(OrderTrackingRole.valueOf(tracking.role()))
                 .setOrderStatus(OrderTrackingStatus.valueOf(tracking.orderStatus()))
@@ -87,12 +96,11 @@ public class OrderTrackingGrpcServer extends OrderTrackingServiceGrpc.OrderTrack
     }
 
     @Override
-    public void findOrderTrackingByOrderId(FindOrderTrackingByOrderIdRequest request, StreamObserver<OrderTrackingResponse> responseObserver) {
-        service.findByOrderId(request.getOrderId())
+    public void findOrderTrackingByOrderNumber(FindOrderTrackingByOrderNumberRequest request, StreamObserver<OrderTrackingResponse> responseObserver) {
+        service.findByOrderNumber(request.getOrderNumber())
             .doOnError(throwable -> responseObserver.onError(statusConverter.toGrpcException(throwable)))
             .map(tracking -> OrderTrackingResponse.newBuilder()
                 .setId(tracking.id())
-                .setOrderId(tracking.orderId())
                 .setOrderNumber(tracking.orderNumber())
                 .setRole(OrderTrackingRole.valueOf(tracking.role()))
                 .setOrderStatus(OrderTrackingStatus.valueOf(tracking.orderStatus()))

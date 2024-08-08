@@ -46,8 +46,14 @@ public class OrderTrackingAdapter implements OrderTrackingPort {
     }
 
     @Override
-    public Mono<OrderTracking> findByOrderId(String orderId) {
-        return orderTrackingRepository.findByOrderIdOrderByOrderDateTime(orderId)
+    public Flux<OrderTracking> findManyByOrderNumber(String orderId) {
+        return orderTrackingRepository.findByOrderNumberOrderByOrderDateTime(orderId)
+            .map(orderTrackingMapper::domainFromEntity);
+    }
+
+    @Override
+    public Mono<OrderTracking> findByOrderNumber(String orderNumber) {
+        return orderTrackingRepository.findByOrderNumberOrderByOrderDateTime(orderNumber)
             .takeLast(1)
             .next()
             .map(orderTrackingMapper::domainFromEntity)

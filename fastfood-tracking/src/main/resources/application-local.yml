@@ -9,7 +9,8 @@ spring:
   data:
     mongodb:
       repositories: true
-      port: 27018
+      port: 27017
+      #port: 27018
 
 server:
   port: 8083

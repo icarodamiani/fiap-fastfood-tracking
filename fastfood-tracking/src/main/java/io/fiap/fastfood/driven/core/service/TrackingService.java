@@ -6,6 +6,8 @@ import io.fiap.fastfood.driven.core.domain.notification.port.outbound.Notificati
 import io.fiap.fastfood.driven.core.domain.tracking.port.inbound.OrderTrackingUseCase;
 import io.fiap.fastfood.driven.core.domain.tracking.port.outbound.OrderTrackingPort;
 import io.vavr.Function1;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,14 +47,24 @@ public class TrackingService implements OrderTrackingUseCase {
     }
 
     private Mono<OrderTracking> tracking(OrderTracking tracking) {
-        return orderTrackingPort.findByOrderId(tracking.orderId())
+        return orderTrackingPort.findManyByOrderNumber(tracking.orderNumber())
+            .next()
             .switchIfEmpty(Mono.defer(() -> Mono.just(tracking)))
             .map(t -> OrderTracking.OrderTrackingBuilder.from(t)
                 .withId(null)
                 .withOrderStatus(tracking.orderStatus())
-                .withOrderStatus(tracking.orderStatusValue())
+                .withOrderStatusValue(tracking.orderStatusValue())
+                .withOrderTimeSpent(timeSpent().apply(t.orderDateTime()))
                 .build());
     }
+
+    private Function1<LocalDateTime, Long> timeSpent() {
+        return then -> {
+            var now = LocalDateTime.now();
+            return ChronoUnit.SECONDS.between(then != null ? then : LocalDateTime.now(), now);
+        };
+    }
+
 
     @Override
     public Mono<OrderTracking> create(OrderTracking orderTracking) {
@@ -60,8 +72,8 @@ public class TrackingService implements OrderTrackingUseCase {
     }
 
     @Override
-    public Mono<OrderTracking> findByOrderId(String orderId) {
-        return orderTrackingPort.findByOrderId(orderId);
+    public Mono<OrderTracking> findByOrderNumber(String orderNumber) {
+        return orderTrackingPort.findByOrderNumber(orderNumber);
     }
 
     @Override

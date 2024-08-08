@@ -9,7 +9,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface OrderTrackingRepository extends ReactiveCrudRepository<OrderTrackingEntity, String> {
-    Flux<OrderTrackingEntity> findByOrderIdOrderByOrderDateTime(String orderId);
+    Flux<OrderTrackingEntity> findByOrderNumberOrderByOrderDateTime(String orderId);
 
     @Aggregation({"{" +
         "      '$group':{" +

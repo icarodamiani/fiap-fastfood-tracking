@@ -10,8 +10,6 @@ public record OrderTrackingEntity(
     @Id
     String id,
     @Field
-    String orderId,
-    @Field
     String orderNumber,
     @Field
     String orderStatus,
@@ -28,7 +26,6 @@ public record OrderTrackingEntity(
 
     public static final class OrderTrackingEntityBuilder {
         private String id;
-        private String orderId;
         private String orderNumber;
         private String orderStatus;
         String orderStatusValue;
@@ -45,11 +42,6 @@ public record OrderTrackingEntity(
 
         public OrderTrackingEntityBuilder withId(String id) {
             this.id = id;
-            return this;
-        }
-
-        public OrderTrackingEntityBuilder withOrderId(String orderId) {
-            this.orderId = orderId;
             return this;
         }
 
@@ -84,7 +76,7 @@ public record OrderTrackingEntity(
         }
 
         public OrderTrackingEntity build() {
-            return new OrderTrackingEntity(id, orderId, orderNumber, orderStatus, orderStatusValue, role,
+            return new OrderTrackingEntity(id, orderNumber, orderStatus, orderStatusValue, role,
                 orderDateTime, orderTimeSpent);
         }
     }

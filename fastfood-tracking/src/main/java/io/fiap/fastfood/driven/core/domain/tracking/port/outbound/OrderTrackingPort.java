@@ -10,7 +10,9 @@ import software.amazon.awssdk.services.sqs.model.Message;
 public interface OrderTrackingPort {
     Mono<OrderTracking> createOrderTracking(OrderTracking orderTracking);
 
-    Mono<OrderTracking> findByOrderId(String orderId);
+    Flux<OrderTracking> findManyByOrderNumber(String orderId);
+
+    Mono<OrderTracking> findByOrderNumber(String orderId);
 
     Flux<OrderTracking> find(Pageable pageable, String role);
 

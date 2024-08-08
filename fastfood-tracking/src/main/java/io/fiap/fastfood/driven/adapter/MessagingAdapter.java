@@ -14,7 +14,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
-import software.amazon.awssdk.services.sqs.model.DeleteMessageResponse;
 import software.amazon.awssdk.services.sqs.model.GetQueueUrlRequest;
 import software.amazon.awssdk.services.sqs.model.GetQueueUrlResponse;
 import software.amazon.awssdk.services.sqs.model.Message;
@@ -50,18 +49,18 @@ public class MessagingAdapter implements MessagingPort {
             .flatMapMany(messages ->
                 Flux.fromIterable(messages)
                     .flatMap(message -> Mono.just(readObject.unchecked().apply(message))
-                        .flatMap(handle)
-                        .map(__ -> message)
-                        .onErrorResume(t ->
-                                t instanceof NotFoundException
-                                    || t instanceof BusinessException
-                                    || t instanceof BadRequestException,
-                            throwable -> {
-                                LOGGER.error(throwable.getMessage(), throwable);
-                                return Mono.just(message);
-                            }
+                        .flatMap(m -> handle.apply(m)
+                            .onErrorResume(t ->
+                                    t instanceof NotFoundException
+                                        || t instanceof BusinessException
+                                        || t instanceof BadRequestException,
+                                throwable -> {
+                                    LOGGER.error(throwable.getMessage(), throwable);
+                                    return Mono.defer(() -> Mono.just(m));
+                                }
+                            )
+                            .flatMap(unused -> ack(queue, message))
                         )
-                        .doOnSuccess(m -> ack(queue, m))
                     )
             );
     }
@@ -78,7 +77,7 @@ public class MessagingAdapter implements MessagingPort {
             ).flatMap(request -> Mono.fromFuture(sqsClient.receiveMessage(request)));
     }
 
-    private Mono<DeleteMessageResponse> ack(String queue, Message message) {
+    private Mono<Message> ack(String queue, Message message) {
         return getQueueUrl().apply(queue)
             .flatMap(q -> Mono.fromFuture(
                     sqsClient.deleteMessage(DeleteMessageRequest.builder()
@@ -89,7 +88,8 @@ public class MessagingAdapter implements MessagingPort {
             )
             .doOnSuccess(deleteMessageResponse -> LOGGER.info("queue message has been deleted: {}", message.messageId()))
             .onErrorResume(ReceiptHandleIsInvalidException.class, e -> Mono.empty())
-            .doOnError(throwable -> LOGGER.error("an error occurred while deleting message.", throwable));
+            .doOnError(throwable -> LOGGER.error("an error occurred while deleting message.", throwable))
+            .map(r -> message);
     }
 
 
